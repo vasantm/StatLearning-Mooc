@@ -1,0 +1,151 @@
+---
+title: "03-Regression"
+author: "Tim Schoof"
+date: "1/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load packages
+library(ISLR)
+library(MASS)
+library(tidyverse)
+library(tidymodels)
+
+# load the data
+boston <- MASS::Boston
+```
+
+# 3.6 Lab: Linear Regression
+
+## Simple linear regression
+
+```{r}
+# code from the book
+lm_fit <- lm(medv~lstat, data = boston)
+summary(lm_fit)
+```
+
+```{r}
+# tidymodels way
+# https://www.tidymodels.org/start/models/
+tidy_lm_fit <- 
+  linear_reg() %>% 
+  set_engine("lm") %>% 
+  fit(medv~lstat, data = boston)
+
+tidy(tidy_lm_fit)
+```
+We don't get any of the model fit data here.
+
+We can get that using `glance`. I'm not quite sure what that is/does.
+
+```{r}
+# https://www.tidymodels.org/learn/statistics/tidy-analysis/
+tidy_lm_fit %>% 
+  glance()
+```
+
+
+We can use the `names()` function to see what is stored in our linear regression fit objects. The objects, not surprisingly perhaps, store different things.
+```{r}
+names(lm_fit)
+names(tidy_lm_fit)
+```
+
+We use the `coef()` function to extract the coefficients.  
+
+```{r}
+coef(lm_fit)
+```
+
+Using the tidymodels approach, you actually already have the coefficients in a tidy format once you've run `tidy(tidy_lm_fit)` and you can just extract them like you would with any data frame or tibble.
+
+```{r}
+tidy_lm_fit %>% 
+  tidy() %>% 
+  select(term, estimate)
+```
+
+Alternatively, we could get the coefficients directly from the stored object, although this feels a bit messy. 
+
+```{r}
+tidy_lm_fit$fit$coefficients
+```
+
+This [https://stackoverflow.com/questions/63087592/how-to-extract-glmnet-coefficients-produced-by-tidymodels](stackoverflow question) might be relevant for more advanced situations. 
+
+In order to obtain a confidence interval for the coefficient estimates, we can use the `confint()` command.
+
+```{r}
+confint(lm_fit)
+```
+
+I'm not sure how to get confidence intervals using tidymodels.
+
+The predict() function can be used to produce confidence intervals and prediction intervals for the prediction of medv for a given value of lstat.
+
+```{r}
+predict(lm_fit, data.frame(lstat=c(5,10,15)), interval="confidence")
+```
+
+Using the tidymodels packages we also use the `predict` function, but a bit differently apparently. To get the same output as above, I'm currently running two lines of code. Figuring out what the best way is to combine the two. 
+
+```{r}
+predict(tidy_lm_fit, data.frame(lstat=c(5,10,15)))
+
+predict(tidy_lm_fit, data.frame(lstat=c(5,10,15)),type = "conf_int",
+  level = 0.95)
+```
+You can also get the prediction interval.
+
+```{r}
+predict(lm_fit, data.frame(lstat=c(5,10,15)), interval="prediction")
+```
+
+```{r}
+predict(tidy_lm_fit, data.frame(lstat=c(5,10,15))) # raw is default
+
+predict(tidy_lm_fit, data.frame(lstat=c(5,10,15)),type =  "pred_int", level = 0.95)
+```
+
+```{r}
+plot(boston$lstat, boston$medv )
+abline(lm_fit )
+```
+
+Let's also plot this using the tidyverse. I'm not sure how to put the regression line on there. 
+
+```{r}
+boston %>% 
+  ggplot(aes(lstat, medv)) +
+  geom_point() + 
+  theme_bw()
+```
+
+```{r}
+par( mfrow=c(2,2))
+plot(lm_fit)
+```
+
+Alternatively, we can compute the residuals from a linear regression fit using the residuals() function. The function rstudent() will return the residuals() studentized residuals, and we can use this function to plot the residuals rstudent() against the fitted values.
+
+```{r}
+plot(predict(lm_fit ), residuals(lm_fit ))
+plot(predict(lm_fit ), rstudent(lm_fit ))
+```
+
+On the basis of the residual plots, there is some evidence of non-linearity. Leverage statistics can be computed for any number of predictors using the hatvalues() function.
+
+```{r}
+plot(hatvalues(lm_fit))
+which.max(hatvalues(lm_fit))
+```
+
+The which.max() function identifies the index of the largest element of a which.max() vector. In this case, it tells us which observation has the largest leverage statistic (related to outliers in the predictor).
+
+
+
+
+
