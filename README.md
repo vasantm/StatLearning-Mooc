@@ -32,7 +32,7 @@ First introductory meet-up to discuss time to meet and what we hope to achieve.
 - Review & Quiz 14: Chapter 3 Quiz
 
 
-### Sun, Jan 31, 2021
+### Saturday, April 3rd, 2021
 - Review & Quiz 15: 4.1 Introduction to Classification Problems
 - Review & Quiz 16: 4.2 Logistic Regression
 - Review & Quiz 17: 4.3 Multivariate Logistic Regression
