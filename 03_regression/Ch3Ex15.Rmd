@@ -1,0 +1,147 @@
+---
+title: "Chapter 3: exercise 15"
+author: "Tim Schoof"
+date: "5/13/2021"
+output: html_document
+---
+
+
+simple and multiple regression:
+* tidymodels: purrr, 95% CI
+
+polynomial regression:
+* tidymodels (recipe etc.)
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, error = FALSE)
+
+# load packages
+library(MASS)
+library(tidyverse)
+library(tidymodels)
+library(kableExtra)
+
+# load data
+d <- MASS::Boston
+```
+
+**a) For each predictor, fit a simple linear regression model to predict the response. Describe your results. in which of the models is there a statistically significant association between the predictor and the response? Create some plots to back up your assertions.**
+
+```{r}
+# I tried this using nest instead of split, but without success
+d_lm <- d %>% 
+  pivot_longer(-crim,names_to = "predictor", values_to = "value") %>% 
+  split(.$predictor) %>% 
+  map(~ lm(crim ~ value, data = .)) %>% 
+  map_dfr(~ broom::tidy(., conf.int = TRUE, conf.level = 0.95), .id = 'source') 
+
+d_lm %>% 
+  kbl(caption = "Simple linear regression models per predictor") %>%
+  kable_classic(full_width = F, position = "left") %>% 
+  row_spec(c(1:2, 5:6, 9:10, 13:14, 17:18, 21:22, 25:26), background = "lightgray")
+```
+
+They're all significant except for 'chas', but the scatter plots look all over the shop.
+
+```{r}
+# my failed 'nest' attempt
+d %>% 
+  pivot_longer(-crim,names_to = "predictor", values_to = "value") %>% 
+  nest(predictor) %>% 
+  map(data, lm(crim ~ value, data = .))
+```
+
+```{r}
+### Add 95% CI, use purrr
+
+# let's try the same with tidymodels!
+lm_spec <- linear_reg() %>%
+  set_mode("regression") %>%
+  set_engine("lm")
+
+lm_fit <- lm_spec %>%
+  fit(crim ~ zn, data = d)
+
+tidy(lm_fit)
+```
+
+
+```{r}
+# not sure how to put the predictor coloumn in the ggplot
+d %>% 
+  pivot_longer(-crim,names_to = "predictor", values_to = "value") %>% 
+  split(.$predictor) %>% 
+  map(~ ggplot(aes(x = value, y = crim), data = .) +
+        geom_point()) 
+```
+
+**Fit a multiple regression model to predict the response using all of the predictors. Describe your results. For which predictors can we reject the null hypothesis H0: Bj = 0**
+
+I don't fully understand the question. You can't reject the null hypothesis for select predictors based on a full model with all predictors. 
+
+```{r}
+d_lm_all <- d %>%
+  lm(crim ~ ., data = .) %>% 
+  broom::tidy(., conf.int = TRUE, conf.level = 0.95) 
+
+d_lm_all %>% 
+  kbl(caption = "Multiple linear regression model with all predictors") %>%
+  kable_classic(full_width = F, position = "left")
+```
+
+```{r}
+### Add 95% CI, use purrr
+
+# let's try the same with tidymodels!
+lm_spec <- linear_reg() %>%
+  set_mode("regression") %>%
+  set_engine("lm")
+
+lm_fit <- lm_spec %>%
+  fit(crim ~ ., data = d)
+
+tidy(lm_fit)
+```
+
+
+**How do your results form (a) compare to your results from (b)? Create a plot displaying the univariate regression coefficients from (a) and the x-axis, and the multiple regression coefficients from (b) on the y-axis. That is, each predictor is displayed as a single point in the plot. Its coefficient in a simple linear regression model is shown on the x-axis, and its coefficient estimate in the multiple linear regression model is shown on the y-axis.**
+
+```{r}
+# this could/should be shorter
+d_compare <- d_lm %>% 
+  filter(!(term == "(Intercept)")) %>% 
+  select(source, estimate) %>% 
+  rename("simple" = "estimate",
+         "term" = "source") %>% 
+  left_join(d_lm_all, by = "term") %>% 
+  select(term, simple,estimate) %>% 
+  rename("multiple" = "estimate")
+
+d_compare %>% 
+  ggplot(aes(x = simple, y = multiple)) +
+  geom_point()
+
+```
+
+That crazy point out there is 'nox'.
+
+**Is there evidence of non-linear association between any of the predictors and the response? To answer this question, for each predictor X, fit a model of the form: Y = B0 + B1X + B2X^2 + B3X^3**
+
+```{r}
+# just sticking with 'split' here
+d_lm_pol <- d %>% 
+  pivot_longer(-crim,names_to = "predictor", values_to = "value") %>% 
+  mutate(value2 = value^2,
+         value3 = value^3) %>% 
+  split(.$predictor) %>% 
+  map(~ lm(crim ~ value + value2 + value3, data = .)) %>% 
+  map_dfr(~ broom::tidy(., conf.int = TRUE, conf.level = 0.95), .id = 'source') 
+
+d_lm_pol %>% 
+  kbl(caption = "Polinomial linear regression models per predictor") %>%
+  kable_classic(full_width = F, position = "left") %>% 
+  row_spec(c(1:4, 9:12, 17:20, 25:28, 33:36, 41:44, 49:52), background = "lightgray")
+```
+
