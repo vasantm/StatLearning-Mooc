@@ -1,0 +1,51 @@
+---
+title: "03-Regression-Excerside13"
+author: "Vasant Marur"
+date: "5/15/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(42)
+suppressPackageStartupMessages(library(dplyr))
+library(ISLR)
+library(broom)
+suppressPackageStartupMessages(library(ggplot2))
+
+
+```
+
+# Introduction
+This is a write up of doing the Applied Exercise 13 of Chap. 3 of ISLR. 
+Question 13 Description is below, each part of the question is in subsections below:
+
+> In this exercise you will create some simulated data and will fit simple
+> linear regression models to it. Make sure to use set.seed(1) prior to
+> starting part (a) to ensure consistent results.
+
+Note: We're setting seed to 42 as that is the answer to everything.
+
+## Question 13 (a)
+> (a) Using the rnorm() function, create a vector, x, containing 100
+> observations drawn from a N(0, 1) distribution. This represents
+> a feature, X.
+
+```{r simulate100}
+x <-rnorm(n = 100, mean = 0, sd = 1)
+x %>% glimpse()
+```
+
+Let's also plot x You can also embed plots, for example:
+
+```{r plotx, echo=FALSE}
+plot(x)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
