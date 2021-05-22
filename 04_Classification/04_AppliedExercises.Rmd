@@ -1,0 +1,85 @@
+---
+title: "04_AppliedExercises"
+author: "Vasant Marur"
+date: "4/3/2021"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#load libraries and data
+library(tidyverse)
+library(reactable) #interactive tables
+library(dygraphs) #interactive time series charting, see http://www.htmlwidgets.org/showcase_dygraphs.html
+library(ISLR)
+data(Weekly)
+Weekly %>% as_tibble(.) ->Weekly_df
+```
+
+# Introduction
+
+This is a write up of doing the Applied Exercise of Chap. 4 of ISLR. 
+Question 10 Description is below, each part of the question is in subsections below:
+
+> 10. This question should be answered using the Weekly data set, which
+> is part of the ISLR package. This data is similar in nature to the
+> Smarket data from this chapter’s lab, except that it contains 1, 089
+> weekly returns for 21 years, from the beginning of 1990 to the end of 2010.
+> 
+
+## Question 10 (a)
+> (a) Produce some numerical and graphical summaries of the Weekly
+> data. Do there appear to be any patterns?
+
+```{r visualization}
+Weekly_df %>%
+group_by(Year) %>% mutate(week =row_number()) %>%
+ungroup() %>%
+select(week,Year,Volume) %>% pivot_wider(., names_from = "Year",values_from = "Volume",names_prefix = "volume_") %>% 
+dygraph(main="Volume of shares traded per week",
+      ylab = "Billions",xlab = "Weeks",periodicity = "weekly") %>%
+dyLegend(show = "onmouseover")
+
+Weekly_df %>%
+group_by(Year) %>% mutate(week =row_number()) %>%
+ungroup() %>%
+select(week,Year,Today) %>% pivot_wider(., names_from = "Year",values_from = "Today",names_prefix = "%return_") %>% 
+dygraph(main="Percentage return per week",
+      ylab = "Billions",xlab = "Weeks",periodicity = "weekly") %>%
+dyLegend(show = "onmouseover")
+
+```
+
+Getting max, min and average ending values for each Year in dataset
+```{r num_summaries}
+Weekly_df %>% 
+  group_by(Year) %>% 
+  summarize(min_ending_value = min(Today, na.rm = TRUE),
+            max_ending_value = max(Today, na.rm = TRUE),
+            Avg_ending_value = round(mean(Today, na.rm = TRUE),digits = 3)) %>% 
+  reactable::reactable()
+
+```
+
+## Question 10 (b)
+> (b) Use the full data set to perform a logistic regression with
+> Direction as the response and the five lag variables plus Volume
+> as predictors. Use the summary function to print the results. Do
+> any of the predictors appear to be statistically significant? If so,
+> which ones?
+ 
+
+You can also embed plots, for example:
+
+```{r logi-reg-10b, echo=TRUE}
+#Weekly_df %>% 
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
