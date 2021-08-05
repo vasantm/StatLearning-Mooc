@@ -4,6 +4,7 @@ We're going to follow along with the mooc course on edx
 Link to [Mooc on edX] (https://www.edx.org/course/statistical-learning)
 Alternative link to videos and slides on [dataschool.io](https://www.dataschool.io/15-hours-of-expert-machine-learning-videos/ (h/t Harithaa)
 
+Updated timelines, because life and work got in the way!
 ## Dates
 ### Wed, Jan 6, 2021
 Course Starts
@@ -75,7 +76,7 @@ First introductory meet-up to discuss time to meet and what we hope to achieve.
 - Review & Quiz 48: 7.R Nonlinear Functions in R
 - Review & Quiz 49: Chapter 7 Quiz
 
-### Saturday, May 1st, 2021
+### Thursday, Aug 12th, 2021
 - Review & Quiz 50: 8.1 Tree-based methods
 - Review & Quiz 51: 8.2 More details on Trees
 - Review & Quiz 52: 8.3 Classification trees
@@ -84,7 +85,7 @@ First introductory meet-up to discuss time to meet and what we hope to achieve.
 - Review & Quiz 55: 8.R Tree-Based Methods in R
 - Review & Quiz 56: Chapter 8 Quiz
 
-### Saturday, May 8th, 2021
+### Thursday, Aug 26th, 2021
 - Review & Quiz 57: 9.1 Optimal Separating Hyperplanes
 - Review & Quiz 58: 9.2 Support Vector Classifier
 - Review & Quiz 59: 9.3 Feature Expansion and the SVM
@@ -92,7 +93,7 @@ First introductory meet-up to discuss time to meet and what we hope to achieve.
 - Review & Quiz 61: 9.R SVMs in R
 - Review & Quiz 62: Chapter 9 Quiz
 
-### Saturday, May 15th, 2021
+### Thursday, Sep 9th, 2021
 - Review & Quiz 63: 10.1 Principal Components
 - Review & Quiz 64: 10.2 Higher Order Principal Components
 - Review & Quiz 65: 10.3 k-means Clustering
